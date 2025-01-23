@@ -15,12 +15,9 @@ pipeline {
                 script {
                     echo 'Building Docker Image...'
                     powershell '''
-                        try {
-                            docker build -t ${DOCKER_IMAGE} .
-                        } catch {
-                            Write-Host "Docker build failed"
-                            exit 1
-                        }
+                        echo "Using docker build (not buildx)"
+                        docker --version
+                        docker build -t ${DOCKER_IMAGE} .
                     '''
                 }
             }
@@ -30,12 +27,8 @@ pipeline {
                 script {
                     echo 'Skipping actual tests, running placeholder...'
                     powershell '''
-                        try {
-                            docker run danielkolodko/gifwebsite pytest --help
-                        } catch {
-                            Write-Host "Test run failed"
-                            exit 1
-                        }
+                        echo "Running test with docker"
+                        docker run ${DOCKER_IMAGE} pytest --help
                     '''
                 }
             }
@@ -46,21 +39,11 @@ pipeline {
                     script {
                         echo 'Logging in to Docker Hub...'
                         powershell '''
-                            try {
-                                docker login -u $Env:DOCKER_USER -p $Env:DOCKER_PASSWORD
-                            } catch {
-                                Write-Host "Docker login failed"
-                                exit 1
-                            }
+                            docker login -u $Env:DOCKER_USER -p $Env:DOCKER_PASSWORD
                         '''
                         echo 'Pushing Docker image...'
                         powershell '''
-                            try {
-                                docker push ${DOCKER_IMAGE}
-                            } catch {
-                                Write-Host "Docker push failed"
-                                exit 1
-                            }
+                            docker push ${DOCKER_IMAGE}
                         '''
                     }
                 }
@@ -71,12 +54,7 @@ pipeline {
                 script {
                     echo 'Deploying application using Docker Compose...'
                     powershell '''
-                        try {
-                            docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
-                        } catch {
-                            Write-Host "Docker Compose up failed"
-                            exit 1
-                        }
+                        docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
                     '''
                 }
             }
@@ -92,4 +70,3 @@ pipeline {
         }
     }
 }
-
