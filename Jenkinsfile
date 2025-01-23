@@ -28,7 +28,7 @@ pipeline {
                     echo 'Running tests using Docker Compose...'
                     // Run pytest in the container; ensure the working directory is set correctly
                     powershell '''
-                        docker run ${DOCKER_COMPOSE_FILE} 
+                        docker run ${DOCKER_COMPOSE_FILE} .
                     '''
                 }
             }
