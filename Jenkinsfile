@@ -27,7 +27,7 @@ pipeline {
                 script {
                     echo 'Deploying application using Docker Compose...'
                     powershell '''
-                        docker compose -f ${DOCKER_COMPOSE_FILE} up -d
+                        docker compose -f ${DOCKER_COMPOSE_FILE} up --detach
                     '''
                 }
             }
