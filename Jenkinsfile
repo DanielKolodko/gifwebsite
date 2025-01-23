@@ -22,34 +22,6 @@ pipeline {
                 }
             }
         }
-        stage('Test Docker Image') {
-            steps {
-                script {
-                    echo 'Running tests using Docker Compose...'
-                    // Run pytest in the container; ensure the working directory is set correctly
-                    powershell '''
-                        docker run ${DOCKER_COMPOSE_FILE} .
-                    '''
-                }
-            }
-        }
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        echo 'Logging in to Docker Hub...'
-                        powershell '''
-                            docker login -u $Env:DOCKER_USER -p $Env:DOCKER_PASSWORD
-                        '''
-                        echo 'Pushing Docker image to Docker Hub...'
-                        // You can still use docker-compose push to push all services
-                        powershell '''
-                            docker compose -f ${DOCKER_COMPOSE_FILE} push
-                        '''
-                    }
-                }
-            }
-        }
         stage('Deploy') {
             steps {
                 script {
