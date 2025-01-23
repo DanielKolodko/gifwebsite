@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'gifwebsite:'
-        DOCKER_COMPOSE_FILE = 'docker-compose.yml' // Specify your compose file
+        DOCKER_IMAGE = 'gifwebsite:latest'  // Include a tag for your image
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'  // Specify your compose file
     }
     stages {
         stage('Checkout') {
@@ -13,11 +13,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker Image...'
+                    echo 'Building Docker Image using Docker Compose...'
+                    // Building using docker-compose build to ensure all services are built
                     powershell '''
-                        echo "Using docker build"
-                        docker --version
-                        docker build -t ${DOCKER_IMAGE} .
+                        echo "Using docker-compose to build the image"
+                        docker-compose -f ${DOCKER_COMPOSE_FILE} build
                     '''
                 }
             }
@@ -25,10 +25,10 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    echo 'Skipping actual tests, running placeholder...'
+                    echo 'Running tests using Docker Compose...'
+                    // Run pytest in the container; ensure the working directory is set correctly
                     powershell '''
-                        echo "Running test with docker"
-                        docker run ${DOCKER_IMAGE} pytest --help
+                        docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm web pytest --help
                     '''
                 }
             }
@@ -41,9 +41,10 @@ pipeline {
                         powershell '''
                             docker login -u $Env:DOCKER_USER -p $Env:DOCKER_PASSWORD
                         '''
-                        echo 'Pushing Docker image...'
+                        echo 'Pushing Docker image to Docker Hub...'
+                        // You can still use docker-compose push to push all services
                         powershell '''
-                            docker push ${DOCKER_IMAGE}
+                            docker-compose -f ${DOCKER_COMPOSE_FILE} push
                         '''
                     }
                 }
