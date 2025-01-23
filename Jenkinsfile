@@ -28,7 +28,7 @@ pipeline {
                     echo 'Running tests using Docker Compose...'
                     // Run pytest in the container; ensure the working directory is set correctly
                     powershell '''
-                        docker compose -f ${DOCKER_COMPOSE_FILE} up --abort-on-container-exit
+                        docker compose -f ${DOCKER_COMPOSE_FILE} up -d
                     '''
                 }
             }
