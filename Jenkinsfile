@@ -38,24 +38,26 @@ pipeline {
     }
     post {
         always {
-            stage('Cleanup') {
-                steps {
-                    script {
-                        // Stop and remove the Docker container if it exists
-                        bat '''
-                        docker ps -q --filter "name=gifwebsite" | findstr . && docker stop gifwebsite && docker rm gifwebsite || echo "No container to clean"
-                        '''
-                        
-                        // Remove the Docker image if needed
-                        bat '''
-                        docker images -q gifwebsite | findstr . && docker rmi gifwebsite || echo "No image to remove"
-                        '''
-                    }
-                    echo 'Cleanup completed.'
-                }
+            script {
+                echo 'Cleaning up Docker resources...'
+                
+                // Stop and remove the Docker container if it exists
+                bat '''
+                docker ps -q --filter "name=gifwebsite" | findstr . && docker stop gifwebsite && docker rm gifwebsite || echo "No container to clean"
+                '''
+                
+                // Remove the Docker image if needed
+                bat '''
+                docker images -q gifwebsite | findstr . && docker rmi gifwebsite || echo "No image to remove"
+                '''
             }
+            echo 'Cleanup completed.'
+        }
+        failure {
+            echo 'Pipeline failed! Check the logs for more details.'
         }
     }
 }
+
 
 
