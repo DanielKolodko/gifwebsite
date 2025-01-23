@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'danielkolodko/gifwebsite:latest'
+        DOCKER_IMAGE = 'gifwebsite:'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml' // Specify your compose file
     }
     stages {
