@@ -15,7 +15,7 @@ pipeline {
                 script {
                     echo 'Building Docker Image...'
                     powershell '''
-                        echo "Using docker build (not buildx)"
+                        echo "Using docker build"
                         docker --version
                         docker build -t ${DOCKER_IMAGE} .
                     '''
