@@ -34,10 +34,12 @@ pipeline {
                     script {
                         echo 'Logging in to Docker Hub...'
                         powershell '''
-                        docker login -u $Env:DOCKER_USER -p $Env:DOCKER_PASSWORD || exit 1
+                        docker login -u $Env:DOCKER_USER -p $Env:DOCKER_PASSWORD -ErrorAction Stop
                         '''
                         echo 'Pushing Docker image...'
-                        powershell "docker push ${DOCKER_IMAGE}"
+                        powershell '''
+                        docker push ${DOCKER_IMAGE} -ErrorAction Stop
+                        '''
                     }
                 }
             }
