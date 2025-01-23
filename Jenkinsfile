@@ -23,7 +23,7 @@ pipeline {
                 script {
                     echo 'Skipping actual tests, running placeholder...'
                     powershell '''
-                    docker run your_image_name pytest --help
+                    docker run danielkolodko/gifwebsite pytest --help
                     '''
                 }
             }
