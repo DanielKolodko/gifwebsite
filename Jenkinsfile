@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Push Docker Image to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     powershell 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD'
                     powershell 'docker push $DOCKER_IMAGE'
                 }
