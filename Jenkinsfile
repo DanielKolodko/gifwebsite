@@ -1,33 +1,36 @@
 pipeline {
     agent any
-    environment {
-        DOCKER_IMAGE = 'gifwebsite:latest'  // Include a tag for your image
-        DOCKER_COMPOSE_FILE = 'docker-compose.yml'  // Specify your compose file
-    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/DanielKolodko/gifwebsite.git'
+                git 'https://github.com/DanielKolodko/gifwebsite.git'
             }
         }
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
-                    echo 'Building Docker Image using Docker Compose...'
-                    // Building using docker-compose build to ensure all services are built
-                    powershell '''
-                        echo "Using docker-compose to build the image"
-                        docker compose -f ${DOCKER_COMPOSE_FILE} build
-                    '''
+                    // Build Docker image
+                    bat 'docker build -t gifwebsite .'
+                    echo 'Building the project completed'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    echo 'Deploying application using Docker Compose...'
-                    powershell '''
-                        docker compose -f ${DOCKER_COMPOSE_FILE} up --detach
+                    // Deploy Docker container
+                    bat 'docker run -d -p 5000:5000 --name gifwebsite gifwebsite'
+                    echo 'Deploying the project'
+
+                    // Wait for the container to be ready
+                    bat '''
+                    :loop
+                    curl http://localhost:5000 || (
+                        echo Waiting for app to start...
+                        timeout /t 5 > nul
+                        goto :loop
+                    )
                     '''
                 }
             }
@@ -35,11 +38,24 @@ pipeline {
     }
     post {
         always {
-            echo 'Cleaning up Docker resources...'
-            powershell 'docker system prune -f'
-        }
-        failure {
-            echo 'Pipeline failed! Check the logs for more details.'
+            stage('Cleanup') {
+                steps {
+                    script {
+                        // Stop and remove the Docker container if it exists
+                        bat '''
+                        docker ps -q --filter "name=gifwebsite" | findstr . && docker stop gifwebsite && docker rm gifwebsite || echo "No container to clean"
+                        '''
+                        
+                        // Remove the Docker image if needed
+                        bat '''
+                        docker images -q gifwebsite | findstr . && docker rmi gifwebsite || echo "No image to remove"
+                        '''
+                    }
+                    echo 'Cleanup completed.'
+                }
+            }
         }
     }
 }
+
+
