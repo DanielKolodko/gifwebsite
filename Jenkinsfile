@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/DanielKolodko/gifwebsite.git'
+                git branch: 'main', url: 'https://github.com/DanielKolodko/gifwebsite.git'
             }
         }
         stage('Build') {
