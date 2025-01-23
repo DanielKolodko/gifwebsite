@@ -17,7 +17,7 @@ pipeline {
                     // Building using docker-compose build to ensure all services are built
                     powershell '''
                         echo "Using docker-compose to build the image"
-                        docker-compose -f ${DOCKER_COMPOSE_FILE} build
+                        docker compose -f ${DOCKER_COMPOSE_FILE} build
                     '''
                 }
             }
@@ -28,7 +28,7 @@ pipeline {
                     echo 'Running tests using Docker Compose...'
                     // Run pytest in the container; ensure the working directory is set correctly
                     powershell '''
-                        docker-compose -f ${DOCKER_COMPOSE_FILE} run web pytest --help
+                        docker compose -f ${DOCKER_COMPOSE_FILE} run web pytest --help
                     '''
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
                         echo 'Pushing Docker image to Docker Hub...'
                         // You can still use docker-compose push to push all services
                         powershell '''
-                            docker-compose -f ${DOCKER_COMPOSE_FILE} push
+                            docker compose -f ${DOCKER_COMPOSE_FILE} push
                         '''
                     }
                 }
@@ -55,7 +55,7 @@ pipeline {
                 script {
                     echo 'Deploying application using Docker Compose...'
                     powershell '''
-                        docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
+                        docker compose -f ${DOCKER_COMPOSE_FILE} up -d
                     '''
                 }
             }
